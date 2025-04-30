@@ -7,6 +7,7 @@ import com.opencsv.CSVReader;
 import jakarta.persistence.EntityManager;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class CarreraRepository {
@@ -47,14 +48,55 @@ public class CarreraRepository {
         List<ReporteDTO> reportes = new ArrayList<>();
 
         try {
-            reportes= em.createQuery("SELECT new DTO.ReporteDTO(" +
-                    "ce.carrera.nombre, " +
-                    "COALESCE(ce.anio_inscripcion, ce.anio_graduacion), " +
-                    "SUM(CASE WHEN ce.anio_inscripcion IS NOT NULL THEN 1 ELSE 0 END), " +
-                    "SUM(CASE WHEN ce.anio_graduacion IS NOT NULL AND ce.anio_graduacion > 0 THEN 1 ELSE 0 END)) " +
-                    "FROM EstudianteCarrera ce " +
-                    "GROUP BY ce.carrera.nombre, COALESCE(ce.anio_inscripcion, ce.anio_graduacion) " +
-                    "ORDER BY ce.carrera.nombre, COALESCE(ce.anio_inscripcion, ce.anio_graduacion)",ReporteDTO.class).getResultList();
+            List<ReporteDTO> inscripciones = em.createQuery(
+                    "SELECT new DTO.ReporteDTO(" +
+                            "    ce.carrera.nombre, " +
+                            "    ce.anio_inscripcion, " +
+                            "    COUNT(ce), " +
+                            "    CAST(0 AS long)) " +
+                            "FROM EstudianteCarrera ce " +
+                            "WHERE ce.anio_inscripcion IS NOT NULL " +
+                            "GROUP BY ce.carrera.nombre, ce.anio_inscripcion",
+                    ReporteDTO.class
+            ).getResultList();
+
+
+            List<ReporteDTO> graduaciones = em.createQuery(
+                    "SELECT new DTO.ReporteDTO(" +
+                            "    ce.carrera.nombre, " +
+                            "    ce.anio_graduacion, " +
+                            "    CAST(0 AS long) , " +
+                            "    COUNT(ce)) " +
+                            "FROM EstudianteCarrera ce " +
+                            "WHERE ce.anio_graduacion IS NOT NULL AND ce.anio_graduacion > 0 " +
+                            "GROUP BY ce.carrera.nombre, ce.anio_graduacion",
+                    ReporteDTO.class
+            ).getResultList();
+
+            reportes.addAll(inscripciones);
+
+            for(ReporteDTO grad:graduaciones){
+                boolean encontro = false;
+
+                for(ReporteDTO insc:reportes){
+
+                    if(grad.getAnio().equals(insc.getAnio()) && grad.getNombreCarrera().equals(insc.getNombreCarrera())){
+                        insc.setGraduados(grad.getGraduados());
+                        encontro = true;
+                        break;
+
+                    }
+                }
+                if(!encontro){
+
+                    reportes.add(grad);
+                }
+            }
+
+            reportes.sort(Comparator.comparing(ReporteDTO::getNombreCarrera)
+                    .thenComparing(ReporteDTO::getAnio));
+
+
 
         }
         catch (Exception e) {
