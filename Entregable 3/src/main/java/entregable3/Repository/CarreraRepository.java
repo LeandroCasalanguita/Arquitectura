@@ -5,12 +5,13 @@ import entregable3.Service.DTO.Carrera.Helper.ReporteCarreraResponseDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 @Repository
 public interface CarreraRepository extends JpaRepository<Carrera, Integer> {
 
-    @Query("SELECT new Service.DTO.Helper.ReporteCarreraResponseDTO(" +
+    @Query("SELECT new entregable3.Service.DTO.Carrera.Helper.ReporteCarreraResponseDTO(" +
             "    ce.carrera.nombre, " +
             "    ce.anio_inscripcion, " +
             "    COUNT(ce), " +
@@ -20,7 +21,7 @@ public interface CarreraRepository extends JpaRepository<Carrera, Integer> {
             "GROUP BY ce.carrera.nombre, ce.anio_inscripcion")
     List<ReporteCarreraResponseDTO> buscarInscriptosPorAnio();
 
-    @Query("SELECT new Service.DTO.Helper.ReporteCarreraResponseDTO(" +
+    @Query("SELECT new entregable3.Service.DTO.Carrera.Helper.ReporteCarreraResponseDTO(" +
             "    ce.carrera.nombre, " +
             "    ce.anio_graduacion, " +
             "    CAST(0 AS long) , " +
@@ -30,7 +31,7 @@ public interface CarreraRepository extends JpaRepository<Carrera, Integer> {
             "GROUP BY ce.carrera.nombre, ce.anio_graduacion")
     List<ReporteCarreraResponseDTO> buscarGraduadosPorAnio();
 
-    @Query ("SELECT c FROM Carrera c WHERE c.carrera=:carrera")
+    @Query ("SELECT c FROM Carrera c WHERE c.nombre=:carrera")
     Carrera buscarPorNombre(String carrera);
 
 }

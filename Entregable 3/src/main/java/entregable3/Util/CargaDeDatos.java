@@ -7,14 +7,16 @@ import entregable3.Repository.CarreraRepository;
 import entregable3.Repository.EstudianteCarreraRepository;
 import entregable3.Repository.EstudianteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
-import java.io.File;
+
+import java.io.*;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import java.io.FileReader;
-import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,19 +39,17 @@ public class CargaDeDatos {
 
     //Carga los datos desde los csv de estudiantes, carreras y estudianteCarrera a la base de datos
     public void cargarDatosCSV() throws IOException {
-        File estudianteCSV = ResourceUtils.getFile("src/main/resources/csv/estudiantes.csv");
-        File carreraCSV = ResourceUtils.getFile("src/main/resources/csv/carreras.csv");
-        File estudianteCarreraCSV = ResourceUtils.getFile("src/main/resources/csv/estudianteCarrera.csv");
+        Resource estudianteCSV = new ClassPathResource("estudiantes.csv");
+        Resource carreraCSV = new ClassPathResource("carreras.csv");
+        Resource estudianteCarreraCSV = new ClassPathResource("estudianteCarrera.csv");
 
         cargarEstudianteCSV(estudianteCSV);
         cargarCarreraCSV(carreraCSV);
         cargarEstudianteCarreraCSV(estudianteCarreraCSV);
-
     }
 
-    //Carga los datos desde el csv de estudiantes
-    public void cargarEstudianteCSV(File estudianteCSV) throws IOException {
-        try (FileReader reader = new FileReader(estudianteCSV);
+    public void cargarEstudianteCSV(Resource estudianteCSV) throws IOException {
+        try (Reader reader = new InputStreamReader(estudianteCSV.getInputStream());
              CSVParser csvParser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader)) {
 
             for (CSVRecord csvRecord : csvParser) {
@@ -58,22 +58,18 @@ public class CargaDeDatos {
         }
     }
 
-    //Carga los datos desde el csv de carreras
-    public void cargarCarreraCSV(File carreraCSV) throws IOException {
-        try (FileReader reader = new FileReader(carreraCSV);
+    public void cargarCarreraCSV(Resource carreraCSV) throws IOException {
+        try (Reader reader = new InputStreamReader(carreraCSV.getInputStream());
              CSVParser csvParser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader)) {
-
             for (CSVRecord csvRecord : csvParser) {
                 persistCarrera(csvRecord);
             }
         }
     }
 
-    //Carga los datos desde el csv de estudianteCarrera
-    public void cargarEstudianteCarreraCSV(File estudianteCarreraCSV) throws IOException {
-        try (FileReader reader = new FileReader(estudianteCarreraCSV);
+    public void cargarEstudianteCarreraCSV(Resource estudianteCarreraCSV) throws IOException {
+        try (Reader reader = new InputStreamReader(estudianteCarreraCSV.getInputStream());
              CSVParser csvParser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader)) {
-
             for (CSVRecord csvRecord : csvParser) {
                 persistEstudianteCarrera(csvRecord);
             }

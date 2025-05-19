@@ -19,4 +19,9 @@ public class CarreraResponseDTO {
         this.inscriptos = 0;
     }
 
+    public CarreraResponseDTO(String nombre, Long cantidadInscriptos) {
+        this.carrera = nombre;
+        this.inscriptos = cantidadInscriptos;
+    }
+
 }

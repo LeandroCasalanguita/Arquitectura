@@ -11,13 +11,14 @@ import java.util.Optional;
 @Repository
 public interface EstudianteCarreraRepository extends JpaRepository<EstudianteCarrera, Integer> {
 
-    @Query("SELECT new Service.DTO.Carrera.CarreraRequestDTO(ce.carrera.nombre, COUNT(ce.estudiante))+" +
+    @Query("SELECT new entregable3.Service.DTO.Carrera.CarreraResponseDTO(ce.carrera.nombre, COUNT(ce.estudiante)) " +
             "FROM EstudianteCarrera ce " +
-            "GROUP BY ce.carrera.nombre" +
+            "GROUP BY ce.carrera.nombre " +
             "ORDER BY COUNT(ce.estudiante) DESC")
     List<CarreraResponseDTO> buscarCarrerasConEstudiantes();
 
-    @Query("SELECT new Service.DTO.Carrera.CarreraRequestDTO(ce)+" +
+
+    @Query("SELECT ce " +
             "FROM EstudianteCarrera ce " +
             "WHERE ce.carrera.id_carrera = :idCarrera " +
             "AND ce.estudiante.dni = :dniEstudiante")

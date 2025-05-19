@@ -33,4 +33,5 @@ public class EstudianteCarrera {
     @JoinColumn (name = "id_carrera")
     private Carrera carrera;
 
+
 }
